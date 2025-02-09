@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Fake LINE Pay Demo</title>
+  <script src="https://static.line-scdn.net/liff/edge/versions/2.1.14/sdk.js"></script>
+</head>
+<body>
+  <h1>輸入圖片 URL</h1>
+  <input type="text" id="imageUrlInput" placeholder="https://example.com/your-image.jpg" style="width:300px;">
+  <button id="sendFlexBtn">發送假 LINE Pay 訊息</button>
+
+  <script>
+    const liffId = '2006870001-vl78YRaQ';
+
+    // 取得 URL query string 的參數（用來判斷是否帶了 imageUrl）
+    function getQueryParam(param) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(param);
+    }
+
+    liff.init({ liffId })
+      .then(() => {
+        if (!liff.isLoggedIn()) {
+          liff.login();
+        }
+        // 如果有帶 imageUrl，代表使用者是從「假 LINE Pay Flex Message」點擊進來的
+        const imageUrl = getQueryParam('imageUrl');
+        if (imageUrl) {
+          // 這裡可以選擇「自動發送」或是先顯示確認按鈕
+          sendImageMessage(imageUrl);
+        }
+      })
+      .catch((err) => {
+        console.error('LIFF init failed', err);
+      });
+
+    // 綁定按鈕，產生並發送「假 LINE Pay Flex Message」
+    document.getElementById('sendFlexBtn').addEventListener('click', async () => {
+      const inputUrl = document.getElementById('imageUrlInput').value.trim();
+      if (!inputUrl) {
+        alert('請輸入圖片 URL');
+        return;
+      }
+      try {
+        const flexMessage = {
+          type: 'flex',
+          altText: 'LINE Pay message',
+          contents: {
+            type: 'bubble',
+            hero: {
+              type: 'image',
+              url: 'https://scontent.xx.fbcdn.net/v/t1.15752-9/475970625_3877491519173657_8734577023823146212_n.png?_nc_cat=107&ccb=1-7&_nc_sid=0024fc&_nc_ohc=llkJIEyDXnIQ7kNvgF_pjGn&_nc_oc=Adi2LOTMXvMQ-HxM11zg-TYwa6MlfeBdE5iaO3GGyI6b9Vb1WldoB5cLfAm9FsARLcZJg2ovvoB1QZ3CA9Vm6GmK&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent.xx&oh=03_Q7cD1gFtxqJZLwPphB_SVqHOV-OInVBbwJgrgF8UKP5J8A5UIA&oe=67CC22D5',
+              size: 'full',
+              aspectRatio: '20:13',
+              aspectMode: 'cover'
+            },
+            body: {
+              type: 'box',
+              layout: 'vertical',
+              contents: [
+                {
+                  type: 'text',
+                  text: '接收 (LINE Pay)',
+                  weight: 'bold',
+                  size: 'md'
+                },
+                {
+                  type: 'text',
+                  text: '您已收到 NT$999 (來自：Kelvin)',
+                  size: 'sm'
+                }
+              ]
+            },
+            footer: {
+              type: 'box',
+              layout: 'vertical',
+              contents: [
+                {
+                  type: 'button',
+                  style: 'primary',
+                  color: '#00c300',
+                  action: {
+                    type: 'uri',
+                    label: '瞭解更多',
+                    uri: `https://liff.line.me/${liffId}?imageUrl=${encodeURIComponent(inputUrl)}`
+                  }
+                }
+              ]
+            }
+          }
+        };
+
+        await liff.sendMessages([flexMessage]);
+        alert('已發送「假 LINE Pay」訊息！');
+        liff.closeWindow();
+      } catch (err) {
+        console.error('發送 Flex Message 錯誤:', err);
+        alert('發送訊息時發生錯誤');
+      }
+    });
+
+    // 發送圖片訊息
+    async function sendImageMessage(imgUrl) {
+      try {
+        await liff.sendMessages([{
+          type: 'image',
+          originalContentUrl: imgUrl,
+          previewImageUrl: imgUrl
+        }]);
+        alert('圖片已發送！');
+        // 發送後可以關閉 LIFF，或做其他操作
+        liff.closeWindow();
+      } catch (err) {
+        console.error('發送圖片訊息錯誤:', err);
+        alert('發送圖片訊息時發生錯誤');
+      }
+    }
+  </script>
+</body>
+</html>
