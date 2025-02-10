@@ -16,34 +16,12 @@
   <script>
     const liffId = '2006870001-vl78YRaQ';
 
-    // 取得 URL query string 的參數（用來判斷是否帶了 imageUrl）
-    function getQueryParam(param) {
-      const urlParams = new URLSearchParams(window.location.search);
-      return urlParams.get(param);
-    }
-
     liff.init({ liffId })
       .then(() => {
         if (!liff.isLoggedIn()) {
           liff.login();
         }
-        // 檢查 URL 是否帶有 imageUrl 參數
-        const imageUrl = getQueryParam('imageUrl');
-        if (imageUrl) {
-          // 隱藏輸入區塊，避免對方看到輸入畫面
-          document.getElementById('inputForm').style.display = 'none';
-          // 直接打開使用者輸入的圖片網址
-          alert("即將打開圖片：" + imageUrl);
-          liff.openWindow({
-            url: imageUrl,
-            external: true
-          });
-        }
       })
-      .catch((err) => {
-        console.error('LIFF init failed', err);
-      });
-
     // 綁定按鈕事件：產生並發送「假 LINE Pay Flex Message」
     document.getElementById('sendFlexBtn').addEventListener('click', async () => {
       const inputUrl = document.getElementById('imageUrlInput').value.trim();
@@ -110,21 +88,6 @@
       }
     });
 
-    // 發送圖片訊息的函式（目前未使用）
-    async function sendImageMessage(imgUrl) {
-      try {
-        await liff.sendMessages([{
-          type: 'image',
-          originalContentUrl: imgUrl,
-          previewImageUrl: imgUrl
-        }]);
-        alert('圖片已發送！');
-        liff.closeWindow();
-      } catch (err) {
-        console.error('發送圖片訊息錯誤:', err);
-        alert('發送圖片訊息時發生錯誤' + JSON.stringify(err));
-      }
-    }
   </script>
 </body>
 </html>
