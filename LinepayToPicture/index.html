@@ -32,8 +32,12 @@
         if (imageUrl) {
           // 隱藏輸入區塊，避免對方看到輸入畫面
           document.getElementById('inputForm').style.display = 'none';
-          // 直接發送圖片訊息
-          sendImageMessage(imageUrl);
+          // 直接顯示圖片
+          alert(imageUrl);
+          liff.openWindow({
+            url: imageUrl,
+            external: false
+          });
         }
       })
       .catch((err) => {
