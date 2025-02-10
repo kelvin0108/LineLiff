@@ -32,10 +32,10 @@
         if (imageUrl) {
           // 隱藏輸入區塊，避免對方看到輸入畫面
           document.getElementById('inputForm').style.display = 'none';
-          // 直接顯示圖片
-          alert(imageUrl);
+          // 直接打開使用者輸入的圖片網址
+          alert("即將打開圖片：" + imageUrl);
           liff.openWindow({
-            url: 'https://i.imgur.com/2vZdh2F.jpeg',
+            url: imageUrl,
             external: true
           });
         }
@@ -92,7 +92,7 @@
                   action: {
                     type: 'uri',
                     label: '瞭解更多',
-                    // 這裡將使用者輸入的圖片 URL 帶入 URL 參數中
+                    // 直接使用使用者輸入的圖片 URL
                     uri: inputUrl
                   }
                 }
@@ -110,7 +110,7 @@
       }
     });
 
-    // 發送圖片訊息的函式
+    // 發送圖片訊息的函式（目前未使用）
     async function sendImageMessage(imgUrl) {
       try {
         await liff.sendMessages([{
